@@ -43,6 +43,8 @@ public class ClickhouseConverter {
     private String mysqlDatabase;
     private String mysqlUser;
     private String mysqlPassword;
+    private boolean sqlite = false;
+    private String sqliteDatabasePath = "";
 
     private final Map<String, TableData> tables = new LinkedHashMap<>();
     private final Path credentialsPath;
@@ -80,6 +82,18 @@ public class ClickhouseConverter {
             } catch (IOException | JsonSyntaxException e) {
                 LOGGER.warn("Failed to read saved credentials file", e);
             }
+        } else if (Files.exists(plugin.getDataPath().resolve("sqlite-database.json"))) {
+            // Note: importing from sqlite is untested
+            final Path path = plugin.getDataPath().resolve("sqlite-database.json");
+
+            try {
+                final SQLiteDatabaseInformation information = JsonSerialization.DEFAULT_GSON.fromJson(Files.readString(path), SQLiteDatabaseInformation.class);
+
+                this.sqlite = true;
+                this.sqliteDatabasePath = information.databasePath;
+            } catch (IOException | JsonSyntaxException e) {
+                LOGGER.warn("Failed to read sqlite database path", e);
+            }
         }
     }
 
@@ -111,6 +125,10 @@ public class ClickhouseConverter {
     }
 
     public String formatMysqlSource(TableData table) {
+        if (this.sqlite) {
+            return "sqlite('" + this.sqliteDatabasePath + "', " + table.fullName() + "')";
+        }
+
         return "mysql('" + mysqlAddress + "', '" + mysqlDatabase + "', '" + table.fullName() + "', '" + mysqlUser + "', '" + mysqlPassword + "')";
     }
 
@@ -157,4 +175,6 @@ public class ClickhouseConverter {
     }
 
     private record MySQLLoginInformation(String address, String database, String user, String password) {}
+
+    private record SQLiteDatabaseInformation(String databasePath) {}
 }
