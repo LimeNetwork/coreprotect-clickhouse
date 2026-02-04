@@ -773,7 +773,6 @@ public final class CopperGolemChestListener implements Listener {
         public int hashCode() {
             return Objects.hash(worldId, x, y, z);
         }
-
     }
 
     private static final class OpenInteractionIndex {

@@ -152,7 +152,6 @@ public class WorldEditLogger extends Queue {
                         Queue.queueBlockBreak(actor.getName(), bisectBlock, bisectBlock.getType(), bisectBlock.getBlockData().getAsString(), null, 0, 0);
                     }
                 }
-
             }
         }
     }
