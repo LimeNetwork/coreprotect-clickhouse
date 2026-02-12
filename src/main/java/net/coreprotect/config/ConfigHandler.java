@@ -221,26 +221,16 @@ public class ConfigHandler extends Queue {
             HikariConfig config = new HikariConfig();
             config.setDriverClassName("com.clickhouse.jdbc.ClickHouseDriver");
 
-            config.setJdbcUrl("jdbc:clickhouse://" + ConfigHandler.host + ":" + ConfigHandler.port + "/" + ConfigHandler.database);
+            String jdbcUrl = "jdbc:clickhouse://" + ConfigHandler.host + ":" + ConfigHandler.port + "/" + ConfigHandler.database;
+            if (Config.getGlobal().ENABLE_SSL) {
+                jdbcUrl += "?ssl=true";
+            }
+            config.setJdbcUrl(jdbcUrl);
             config.setUsername(ConfigHandler.username);
             config.setPassword(ConfigHandler.password);
             config.setMaximumPoolSize(ConfigHandler.maximumPoolSize);
             config.setMaxLifetime(60000);
-            config.addDataSourceProperty("characterEncoding", "UTF-8");
-            config.addDataSourceProperty("connectionTimeout", "10000");
-            /* https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration */
-            /* https://cdn.oreillystatic.com/en/assets/1/event/21/Connector_J%20Performance%20Gems%20Presentation.pdf */
-            config.addDataSourceProperty("cachePrepStmts", "true");
-            config.addDataSourceProperty("prepStmtCacheSize", "250");
-            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-            config.addDataSourceProperty("useServerPrepStmts", "true");
-            config.addDataSourceProperty("useLocalSessionState", "true");
-            config.addDataSourceProperty("rewriteBatchedStatements", "true");
-            config.addDataSourceProperty("cacheServerConfiguration", "true");
-            config.addDataSourceProperty("maintainTimeStats", "false");
-            /* Disable SSL to suppress the unverified server identity warning */
-            config.addDataSourceProperty("allowPublicKeyRetrieval", "true");
-            config.addDataSourceProperty("useSSL", String.valueOf(Config.getGlobal().ENABLE_SSL));
+            config.setConnectionTimeout(10000);
 
             ConfigHandler.hikariDataSource = new HikariDataSource(config);
         }
@@ -331,7 +321,7 @@ public class ConfigHandler extends Queue {
 
     /**
      * Unified method to reload cache from database when DATABASE_LOCK is false (multi-server setup)
-     * 
+     *
      * @param type
      *            The type of cache to reload
      * @param name
@@ -514,5 +504,4 @@ public class ConfigHandler extends Queue {
         Database.closeConnection();
         ListenerHandler.unregisterNetworking(); // Unregister channels for networking API
     }
-
 }
