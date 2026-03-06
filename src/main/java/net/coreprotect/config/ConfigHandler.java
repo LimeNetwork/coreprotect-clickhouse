@@ -242,16 +242,13 @@ public class ConfigHandler extends Queue {
         try (final ResultSet rs = statement.executeQuery("SELECT id,material FROM " + ConfigHandler.prefix + "material_map")) {
             ConfigHandler.materials.clear();
             ConfigHandler.materialsReversed.clear();
-            MAX_MATERIAL_ID.set(0);
 
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String material = rs.getString("material");
                 ConfigHandler.materials.put(material, id);
                 ConfigHandler.materialsReversed.put(id, material);
-                if (id > MAX_MATERIAL_ID.get()) {
-                    MAX_MATERIAL_ID.set(id);
-                }
+                MAX_MATERIAL_ID.updateAndGet(curr -> Math.max(id, curr));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -262,7 +259,6 @@ public class ConfigHandler extends Queue {
         try (final ResultSet rs = statement.executeQuery("SELECT id,data FROM " + ConfigHandler.prefix + "blockdata_map")) {
             ConfigHandler.blockdata.clear();
             ConfigHandler.blockdataReversed.clear();
-            MAX_BLOCKDATA_ID.set(0);
 
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -280,7 +276,6 @@ public class ConfigHandler extends Queue {
         try (final ResultSet rs = statement.executeQuery("SELECT id,art FROM " + ConfigHandler.prefix + "art_map")) {
             ConfigHandler.art.clear();
             ConfigHandler.artReversed.clear();
-            MAX_ART_ID.set(0);
 
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -298,7 +293,6 @@ public class ConfigHandler extends Queue {
         try (final ResultSet rs = statement.executeQuery("SELECT id,entity FROM " + ConfigHandler.prefix + "entity_map")) {
             ConfigHandler.entities.clear();
             ConfigHandler.entitiesReversed.clear();
-            MAX_ENTITY_ID.set(0);
 
             while (rs.next()) {
                  int id = rs.getInt("id");
