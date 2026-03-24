@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.coreprotect.thread.Scheduler;
 import org.bukkit.GameEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
